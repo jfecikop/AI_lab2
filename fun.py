@@ -8,39 +8,77 @@ def function(x, y, a, b, c):
     return a * (x**2 - b * math.cos(c * math.pi * x)) - y
 
 
-def calculate(x, y, a, b, c):
+def calculate_rank(x, y, a, b, c):
     rank = abs(1/function(x, y, a, b, c))
     return rank
 
 
-def Average(list):
+def get_average_rank(ranks):
 
-    return sum(list)/len(list)
+    return sum(ranks) / len(ranks)
 
-def Mutate_uniform(list, multiplier):
-    new_generation = copy.copy(list)
-    for i in range(multiplier):
-        for individual in range(len(list)):
-            new_generation.append(copy.copy(list[individual]))
-    for new_individual in range(len(list), len(new_generation)):
+
+def get_mutated_by_uniform(x, y, generation, multiplier):
+    new_generation = copy.copy(generation)
+    for i in range(multiplier - 1):
+        for individual in range(len(generation)):
+            new_generation.append(copy.copy(generation[individual]))
+    for new_individual in range(len(generation), len(new_generation)):
         new_generation[new_individual][0] = new_generation[new_individual][0] + random.uniform(0.0, 1.0)
         new_generation[new_individual][1] = new_generation[new_individual][1] + random.uniform(0.0, 1.0)
         new_generation[new_individual][2] = new_generation[new_individual][2] + random.uniform(0.0, 1.0)
 
-    return new_generation
+    return get_generation_with_ranks(x, y, new_generation)
 
-def Mutate_normal(list, multiplier):
-    new_generation = copy.copy(list)
-    for i in range(multiplier):
-        for individual in range(len(list)):
-            new_generation.append(copy.copy(list[individual]))
-    for new_individual in range(len(list), len(new_generation)):
+
+def get_mutated_by_normal(x, y, generation, multiplier):
+    new_generation = copy.copy(generation)
+    for i in range(multiplier-1):
+        for individual in range(len(generation)):
+            new_generation.append(copy.copy(generation[individual]))
+    for new_individual in range(len(generation), len(new_generation)):
         new_generation[new_individual][0] = new_generation[new_individual][0] + random.random()
         new_generation[new_individual][1] = new_generation[new_individual][1] + random.random()
         new_generation[new_individual][2] = new_generation[new_individual][2] + random.random()
 
-    return new_generation
+    return get_generation_with_ranks(x, y, new_generation)
 
 
-def Sort(list):
-    return sorted(list, key=itemgetter(3), reverse=True)
+def get_first_generation_with_ranks(x, y, generation):
+    ranks = []
+    for i in range(len(x)):
+        ranks.append(i)
+
+    for individual in range(len(generation)):
+        for index in range(len(x)):
+            ranks[index] = calculate_rank(x[index], y[index], generation[individual][0], generation[individual][1],
+                                          generation[individual][2])
+        generation[individual].append(abs(get_average_rank(ranks)))
+    return generation
+
+
+def get_generation_with_ranks(x, y, generation):
+    ranks = []
+    for i in range(len(x)):
+        ranks.append(i)
+
+    for individual in range(len(generation)):
+        for index in range(len(x)):
+            ranks[index] = calculate_rank(x[index], y[index], generation[individual][0], generation[individual][1],
+                                          generation[individual][2])
+        generation[individual][3] = abs(get_average_rank(ranks))
+    return generation
+
+
+"""def get_sorted_generation_by_rank(generation):
+    return sorted(generation, key=itemgetter(3), reverse=True)"""
+
+#zrobić sortowanie do libczy najbliższej 1
+def get_sorted_generation_by_rank(generation):
+    return sorted(generation, key=lambda l: (1 - l[3]))
+
+
+def print_3_best_individuals(generation):
+    for x in range(0, 3):
+        print(get_sorted_generation_by_rank(generation)[x][3])
+    print('\n')

@@ -1,6 +1,6 @@
 import random
 import fun
-
+import copy
 
 """
 In list first generation: 
@@ -10,27 +10,26 @@ In list first generation:
     [3] = rank of individual 
 """
 
-number_of_initial_population = 100
+number_of_initial_population = 3
 first_generation = [[random.random()] * 3 for _ in range(number_of_initial_population)]
 x = []
 y = []
 ranks = []
 multiplier = 5
+
 with open('ES_data_7.dat', encoding='utf-8') as data:
     for line in data:
         x.append(float(line[:line.rfind(" ")]))
         y.append(float(line[line.rfind(" "):]))
 
-for i in range(len(x)):
-    ranks.append(i)
+generation = copy.copy(fun.get_first_generation_with_ranks(x, y, first_generation))
+fun.print_3_best_individuals(generation)
 
-for individual in range(len(first_generation)):
-    for index in range(len(x)):
-        ranks[index] = fun.calculate(x[index], y[index], first_generation[individual][0], first_generation[individual][1], first_generation[individual][2])
-    first_generation[individual].append(fun.Average(ranks))
+generation = fun.get_mutated_by_uniform(x, y, generation, multiplier)
+fun.print_3_best_individuals(generation)
 
+while fun.get_sorted_generation_by_rank(generation)[0][3] != 1:
+    generation = fun.get_mutated_by_normal(x, y, generation, multiplier)
+    fun.print_3_best_individuals(generation)
 
-
-print(fun.Mutate_uniform(first_generation, multiplier))
-
-print("ok")
+print("Program ended")
