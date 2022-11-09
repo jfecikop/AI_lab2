@@ -74,8 +74,18 @@ def get_generation_with_ranks(x, y, generation):
     return sorted(generation, key=itemgetter(3), reverse=True)"""
 
 #zrobić sortowanie do libczy najbliższej 1
-def get_sorted_generation_by_rank(generation):
-    return sorted(generation, key=lambda l: (1 - l[3]))
+def get_sorted_generation_by_rank(generation, number_of_best_results):
+    best_results = [0] * number_of_best_results
+    individual = 0
+    while individual < len(generation):
+        if generation[individual][3] <= 1.0:
+            best_results.sort()
+            for rank in range(len(best_results)):
+                if generation[individual][3] > best_results[rank]:
+                    best_results[rank] = generation[individual][3]
+                    break
+        individual = individual + 1
+    return best_results
 
 
 def print_3_best_individuals(generation):
